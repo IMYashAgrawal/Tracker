@@ -61,12 +61,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation("androidx.compose.material:material-icons-extended")
 
     implementation(libs.kotlinx.serialization.json)
     
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest)
-    implementation(libs.supabase.auth)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

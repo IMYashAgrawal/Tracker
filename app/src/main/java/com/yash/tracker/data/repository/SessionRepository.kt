@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.UUID
 
+/**
+ * DB model for the `entries` table.
+ * Only `id` + `encrypted_payload`. No user_id — everything is encrypted client-side.
+ */
 @Serializable
-data class EncryptedHabitEntry(
+data class EncryptedEntry(
     val id: String,
-    val user_id: String,
     val encrypted_payload: String
 )
 
@@ -28,21 +30,21 @@ object SessionRepository {
     suspend fun saveRecord(record: HabitRecord) {
         val plaintext = json.encodeToString(record)
         val encryptedPayload = CryptoManager.encrypt(plaintext)
-        
+
         val entry = mapOf(
             "id" to record.id,
             "encrypted_payload" to encryptedPayload
         )
 
-        SupabaseManager.client.from("habit_entries").upsert(entry)
-        
-        // Update local state
+        SupabaseManager.client.from("entries").upsert(entry)
+
+        // Update local in-memory state
         _records.value = (listOf(record) + _records.value.filter { it.id != record.id })
             .sortedByDescending { it.session_date + it.session_time }
     }
 
     suspend fun deleteRecord(recordId: String) {
-        SupabaseManager.client.from("habit_entries").delete {
+        SupabaseManager.client.from("entries").delete {
             filter {
                 eq("id", recordId)
             }
@@ -51,16 +53,17 @@ object SessionRepository {
     }
 
     suspend fun fetchAllRecords() {
-        val entries = SupabaseManager.client.from("habit_entries").select().decodeList<EncryptedHabitEntry>()
+        val entries = SupabaseManager.client.from("entries").select().decodeList<EncryptedEntry>()
         val decryptedRecords = entries.mapNotNull { entry ->
             try {
                 val plaintext = CryptoManager.decrypt(entry.encrypted_payload)
                 json.decodeFromString<HabitRecord>(plaintext)
             } catch (e: Exception) {
+                // Entries that can't be decrypted with the current session key are silently skipped.
                 null
             }
         }.sortedByDescending { it.session_date + it.session_time }
-        
+
         _records.value = decryptedRecords
     }
 

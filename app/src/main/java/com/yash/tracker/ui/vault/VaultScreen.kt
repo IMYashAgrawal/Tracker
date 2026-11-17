@@ -51,13 +51,9 @@ fun VaultScreen(
                 else -> {}
             }
 
-            if (uiState is VaultState.Locked || uiState is VaultState.NeedSetup || uiState is VaultState.Error) {
-                val isSetup = uiState is VaultState.NeedSetup
-                
+            if (uiState is VaultState.Locked || uiState is VaultState.Error) {
                 Text(
-                    text = if (isSetup) 
-                        "Set a master password to encrypt your data. This password is never stored." 
-                        else "Enter your password to unlock your records.",
+                    text = "Enter your password to unlock.",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -65,7 +61,7 @@ fun VaultScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Master Password") },
+                    label = { Text("Password") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth(),
@@ -74,13 +70,14 @@ fun VaultScreen(
 
                 Button(
                     onClick = {
-                        if (isSetup) viewModel.setupVault(password)
-                        else viewModel.unlockVault(password)
+                        viewModel.unlockVault(password)
+                        // Clear password from the text field's memory
+                        password = ""
                     },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = password.isNotBlank() && uiState !is VaultState.Loading
                 ) {
-                    Text(if (isSetup) "Initialize Vault" else "Unlock")
+                    Text("Unlock")
                 }
             }
         }

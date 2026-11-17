@@ -23,6 +23,7 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = viewModel()
 ) {
     val records by viewModel.records.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
     var selectedRecord by remember { mutableStateOf<HabitRecord?>(null) }
     val scope = rememberCoroutineScope()
 
@@ -56,7 +57,24 @@ fun HistoryScreen(
                 TopAppBar(title = { Text("Session History") })
             }
         ) { padding ->
-            if (records.isEmpty()) {
+            if (errorMessage != null) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding), contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                        Text(
+                            errorMessage ?: "Unknown error",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Button(onClick = { viewModel.refresh() }) {
+                            Text("Retry")
+                        }
+                    }
+                }
+            } else if (records.isEmpty()) {
                 Box(
                     Modifier
                         .fillMaxSize()

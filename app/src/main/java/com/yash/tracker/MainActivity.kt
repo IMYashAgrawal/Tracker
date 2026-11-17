@@ -24,6 +24,7 @@ import androidx.navigation.compose.*
 import com.yash.tracker.security.VaultLifecycleObserver
 import com.yash.tracker.ui.screen1_log.LogScreen
 import com.yash.tracker.ui.screen2_history.HistoryScreen
+import com.yash.tracker.ui.screen3_analysis.AnalysisScreen
 import com.yash.tracker.ui.theme.TrackerTheme
 import com.yash.tracker.ui.vault.VaultScreen
 import com.yash.tracker.ui.vault.VaultState
@@ -32,7 +33,7 @@ import com.yash.tracker.ui.vault.VaultViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         // Prevent screenshots and hide content in Recents switcher
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE,
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
                 val vaultViewModel: VaultViewModel = viewModel()
                 val vaultState by vaultViewModel.uiState.collectAsState()
 
-                // Register observer for auto-lock
+                // Register observer for auto-lock when app goes to background
                 DisposableEffect(Unit) {
                     val observer = VaultLifecycleObserver {
                         vaultViewModel.lock()
@@ -111,11 +112,7 @@ fun MainNavigation() {
         ) {
             composable(Screen.Log.route) { LogScreen() }
             composable(Screen.History.route) { HistoryScreen() }
-            composable(Screen.Analysis.route) { 
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                    Text("Analysis Screen (Coming Soon)") 
-                }
-            }
+            composable(Screen.Analysis.route) { AnalysisScreen() }
         }
     }
 }
