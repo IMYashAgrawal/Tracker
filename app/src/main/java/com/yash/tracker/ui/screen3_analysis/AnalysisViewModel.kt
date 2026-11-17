@@ -67,7 +67,7 @@ class AnalysisViewModel : ViewModel() {
                     overview = overview,
                     insights = insights
                 )
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message ?: "Analysis failed"

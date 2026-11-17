@@ -27,7 +27,7 @@ class HistoryViewModel : ViewModel() {
             try {
                 SessionRepository.fetchAllRecords()
                 _errorMessage.value = null
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 _errorMessage.value = e.message ?: "Failed to load records"
             }
         }
@@ -37,7 +37,7 @@ class HistoryViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 SessionRepository.saveRecord(record)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 _errorMessage.value = e.message ?: "Failed to update record"
             }
         }
@@ -47,7 +47,7 @@ class HistoryViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 SessionRepository.deleteRecord(record.id)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 _errorMessage.value = e.message ?: "Failed to delete record"
             }
         }

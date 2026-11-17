@@ -10,13 +10,22 @@ import io.github.jan.supabase.postgrest.Postgrest
  * The anon key grants access; the single RLS policy is `true`.
  */
 object SupabaseManager {
-    private const val SUPABASE_URL = BuildConfig.SUPABASE_URL
-    private const val SUPABASE_KEY = BuildConfig.SUPABASE_KEY
+    val client: SupabaseClient by lazy {
+        val url = BuildConfig.SUPABASE_URL.trim()
+        val key = BuildConfig.SUPABASE_KEY.trim()
 
-    val client: SupabaseClient = createSupabaseClient(
-        supabaseUrl = SUPABASE_URL,
-        supabaseKey = SUPABASE_KEY
-    ) {
-        install(Postgrest)
+        require(url.isNotBlank() && (url.startsWith("http://") || url.startsWith("https://"))) {
+            "Supabase URL is not configured. Please add 'supabase.url=https://YOUR_PROJECT.supabase.co' to local.properties and rebuild the app."
+        }
+        require(key.isNotBlank()) {
+            "Supabase Key is not configured. Please add 'supabase.key=YOUR_ANON_KEY' to local.properties and rebuild the app."
+        }
+
+        createSupabaseClient(
+            supabaseUrl = url,
+            supabaseKey = key
+        ) {
+            install(Postgrest)
+        }
     }
 }

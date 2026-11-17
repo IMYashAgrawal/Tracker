@@ -18,7 +18,8 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class EncryptedEntry(
     val id: String,
-    val encrypted_payload: String
+    val encrypted_payload: String,
+    val created_at: String? = null
 )
 
 object SessionRepository {
@@ -31,9 +32,9 @@ object SessionRepository {
         val plaintext = json.encodeToString(record)
         val encryptedPayload = CryptoManager.encrypt(plaintext)
 
-        val entry = mapOf(
-            "id" to record.id,
-            "encrypted_payload" to encryptedPayload
+        val entry = EncryptedEntry(
+            id = record.id,
+            encrypted_payload = encryptedPayload
         )
 
         SupabaseManager.client.from("entries").upsert(entry)

@@ -25,7 +25,7 @@ class LogViewModel : ViewModel() {
             try {
                 SessionRepository.saveRecord(record)
                 _uiState.value = LogUiState.Success
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 _uiState.value = LogUiState.Error(e.message ?: "Failed to save record")
             }
         }
